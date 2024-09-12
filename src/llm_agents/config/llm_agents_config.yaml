@@ -1,0 +1,5 @@
+num_agents: 3
+agent_names:
+  - agent1
+  - agent2
+  - agent3

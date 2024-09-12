@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/samko/ros_llm_ws/devel/setup.sh

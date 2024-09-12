@@ -1,0 +1,15 @@
+<launch>
+  <arg name="num_agents" default="3"/>
+  
+  <node pkg="llm_agents" type="llm_agent_node.py" name="agent1" output="screen">
+    <param name="agent_id" value="agent1"/>
+  </node>
+
+  <node pkg="llm_agents" type="llm_agent_node.py" name="agent2" output="screen">
+    <param name="agent_id" value="agent2"/>
+  </node>
+
+  <node pkg="llm_agents" type="llm_agent_node.py" name="agent3" output="screen">
+    <param name="agent_id" value="agent3"/>
+  </node>
+</launch>

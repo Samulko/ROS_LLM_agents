@@ -1,0 +1,8 @@
+prefix=/home/samko/ros_llm_ws/install
+
+Name: llm_agents
+Description: Description of llm_agents
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: rospy std_msgs message_runtime

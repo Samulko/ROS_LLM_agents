@@ -1,0 +1,7 @@
+set(llm_agents_SETUP_PY_SETUP_MODULE "setuptools")
+set(llm_agents_SETUP_PY_VERSION "0.0.0")
+set(llm_agents_SETUP_PY_SCRIPTS "")
+set(llm_agents_SETUP_PY_PACKAGES "llm_agents")
+set(llm_agents_SETUP_PY_PACKAGE_DIRS "src/llm_agents")
+set(llm_agents_SETUP_PY_MODULES "")
+set(llm_agents_SETUP_PY_MODULE_DIRS "")
