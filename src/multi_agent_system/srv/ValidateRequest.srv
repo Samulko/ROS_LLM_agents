@@ -1,0 +1,4 @@
+string request
+---
+bool is_standard
+string validation_details

@@ -1,0 +1,10 @@
+<launch>
+    <!-- Set environment variable for OpenAI API Key -->
+    <param name="/openai_api_key" value="$(env OPENAI_API_KEY)" />
+
+    <!-- Manager Agent Node -->
+    <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen" />
+
+    <!-- Structural Engineer Agent Node -->
+    <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" output="screen" />
+</launch>
