@@ -27,6 +27,7 @@ def test_manager_agent():
 
 if __name__ == '__main__':
     try:
+        rospy.loginfo("Starting test_manager_agent node")
         test_manager_agent()
     except rospy.ROSInterruptException:
         pass

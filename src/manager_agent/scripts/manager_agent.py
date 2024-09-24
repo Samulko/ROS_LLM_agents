@@ -81,41 +81,45 @@ class ManagerAgent:
     def handle_user_command(self, msg):
         # Process incoming user commands
         user_command = msg.data
-        rospy.loginfo(f"ManagerAgent: Received user command: {user_command}")
+        rospy.loginfo(f"[ManagerAgent] Received user command: {user_command}")
 
         # Use the language model to interpret the command
-        response = self.llm.predict(human_input=user_command)
-        interpreted_command = response.strip()
-        rospy.loginfo(f"ManagerAgent: Interpreted command: {interpreted_command}")
+        try:
+            response = self.llm.invoke(input=user_command)
+            interpreted_command = response.content.strip()
+            rospy.loginfo(f"[ManagerAgent] Interpreted command: {interpreted_command}")
 
-        # Process the interpreted command
-        self.process_command(interpreted_command)
+            # Process the interpreted command
+            self.process_command(interpreted_command)
+        except Exception as e:
+            rospy.logerr(f"[ManagerAgent] Error interpreting command: {e}")
+            self.user_feedback_pub.publish("Error interpreting command. Please try again.")
 
     def process_command(self, command):
         # Process the interpreted command and interact with other agents
         if self.validate_request is None:
-            rospy.logwarn("ManagerAgent: Structural Engineer Agent service is not available. Retrying connection...")
+            rospy.logwarn("[ManagerAgent] Structural Engineer Agent service is not available. Retrying connection...")
             self.user_feedback_pub.publish("I'm sorry, but I can't validate your request at the moment. Please try again later.")
             return
 
         try:
             # Validate the request with Structural Engineer Agent
-            rospy.loginfo(f"ManagerAgent: Sending validation request to Structural Engineer Agent: {command}")
+            rospy.loginfo(f"[ManagerAgent] Sending validation request to Structural Engineer Agent: {command}")
             validation_response = self.validate_request(command)
-            rospy.loginfo(f"ManagerAgent: Received validation response: {validation_response}")
+            rospy.loginfo(f"[ManagerAgent] Received validation response: {validation_response}")
 
             if validation_response.is_standard:
-                rospy.loginfo(f"ManagerAgent: Request is standard: {validation_response.validation_details}")
+                rospy.loginfo(f"[ManagerAgent] Request is standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request follows standard procedures. Here are the details: {validation_response.validation_details}")
             else:
-                rospy.loginfo(f"ManagerAgent: Request is non-standard: {validation_response.validation_details}")
+                rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Here's why: {validation_response.validation_details}")
                 
             # Add the validation result to the conversation memory
             self.memory.chat_memory.add_ai_message(f"Validation result: {validation_response.validation_details}")
             
         except rospy.ServiceException as e:
-            rospy.logerr(f"ManagerAgent: Service call failed: {e}")
+            rospy.logerr(f"[ManagerAgent] Service call failed: {e}")
             self.user_feedback_pub.publish(f"I encountered an error while processing your request. Please try again.")
 
 if __name__ == '__main__':

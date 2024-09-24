@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(structural_engineer_agent)
 
-
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
@@ -11,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   CATKIN_DEPENDS rospy std_msgs multi_agent_system
 )
-
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

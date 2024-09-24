@@ -1,0 +1,30 @@
+Run the ROS Launch File:
+Ensure that the ROS launch file is running and both the manager_agent and structural_engineer_agent nodes are active:
+
+```bash
+roslaunch manager_agent manager_agent.launch
+```
+
+This command will start the ROS master, the manager_agent node, and any other necessary nodes.
+
+
+Manually Publish a Message to the /user_command Topic:
+In another terminal, use the rostopic pub command to manually publish a message to the /user_command topic:
+
+```bash
+rostopic pub -1 /user_command std_msgs/String "data: 'Disassemble the a frame consisting of 3 elements, two columns and a beam'"
+```
+
+This command will send the specified message to the manager_agent node.
+
+
+Listen to the /user_feedback Topic:
+In another terminal, use the rostopic echo command to listen to the /user_feedback topic to see the response from the manager_agent:
+
+```bash
+rostopic echo /user_feedback
+```
+
+This will display the feedback messages received by the manager_agent node.
+
+
