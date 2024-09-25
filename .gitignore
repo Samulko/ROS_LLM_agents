@@ -59,3 +59,8 @@ srv_gen/
 # Aider
 .aider.chat.history.md
 .aider.input.history
+
+# Virtual environment
+aider_venv/
+aider_venv_311/
+.aider*
