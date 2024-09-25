@@ -55,3 +55,7 @@ Thumbs.db
 # ROS package artifacts
 msg_gen/
 srv_gen/
+
+# Aider
+.aider.chat.history.md
+.aider.input.history

@@ -2,7 +2,8 @@
 
 import rospy
 from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse
-from langchain_openai import ChatOpenAI
+import openai
+from openai import OpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OpenAIEmbeddings
@@ -27,8 +28,8 @@ class StructuralEngineerAgent:
             if not self.openai_api_key:
                 raise ValueError("OPENAI_API_KEY not found in environment variables")
 
-            # Initialize ChatOpenAI model
-            self.llm = ChatOpenAI(temperature=0, model_name="gpt-4o-mini", api_key=self.openai_api_key)
+            # Initialize OpenAI client
+            self.client = OpenAI(api_key=self.openai_api_key)
 
             # Initialize RAG (Retrieval-Augmented Generation) system
             self.initialize_rag_system()
@@ -114,9 +115,15 @@ class StructuralEngineerAgent:
             context = "\n".join([doc.page_content for doc in docs])
             rospy.loginfo(f"StructuralEngineerAgent: Retrieved context: {context}")
 
-            # Use the language model to validate the request
-            response = self.llm(self.prompt.format_messages(request=request, context=context))
-            validation_details = response.content
+            # Use the OpenAI client to validate the request
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": self.prompt.format(request=request, context=context)},
+                    {"role": "user", "content": request}
+                ]
+            )
+            validation_details = response.choices[0].message.content
             rospy.loginfo(f"StructuralEngineerAgent: Validation details: {validation_details}")
 
             # Determine if the request follows standard procedures

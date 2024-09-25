@@ -3,7 +3,9 @@
 import rospy
 from std_msgs.msg import String
 from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse
-from langchain_openai import ChatOpenAI
+import openai
+from openai import OpenAI
+from langchain_openai import ChatOpenAI  # This import should work now
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
