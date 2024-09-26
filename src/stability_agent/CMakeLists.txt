@@ -11,6 +11,16 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   multi_agent_system
+  message_generation
+)
+
+catkin_package(
+  CATKIN_DEPENDS rospy std_msgs multi_agent_system message_runtime
+)
+
+catkin_install_python(PROGRAMS
+  scripts/stability_agent.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## System dependencies are found with CMake's conventions

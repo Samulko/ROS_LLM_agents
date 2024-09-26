@@ -15,3 +15,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+catkin_install_python(PROGRAMS
+  scripts/structural_engineer_agent.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
