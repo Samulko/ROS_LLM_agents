@@ -48,7 +48,6 @@ Thumbs.db
 *.zip
 
 # Logs and databases
-*.log
 *.sql
 *.sqlite
 
