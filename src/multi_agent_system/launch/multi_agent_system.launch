@@ -23,5 +23,7 @@
     </node>
 
     <!-- Output the log file path -->
-    <node name="log_file_path_publisher" pkg="rostopic" type="rostopic" args="pub /log_file_path std_msgs/String 'data: $(find multi_agent_system)/../data/responses/agent_responses_$(arg run_id).log'" output="screen" />
+    <node name="log_file_path_publisher" pkg="multi_agent_system" type="log_file_path_publisher.py" output="screen">
+        <param name="log_file_path" value="$(find multi_agent_system)/../data/responses/agent_responses_$(arg run_id).log" />
+    </node>
 </launch>

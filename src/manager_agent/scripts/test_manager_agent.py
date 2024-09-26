@@ -35,12 +35,15 @@ class TestManagerAgent(unittest.TestCase):
         # Wait for the full processing cycle
         rospy.sleep(15)  # Increased wait time
         
-        # Check for validation and stability analysis results
+        # Check for validation result
         self.assertTrue(
             "Validation result" in self.feedback_message or "Your request doesn't follow standard procedures" in self.feedback_message,
             "No validation result received"
         )
-        self.assertIn("Stability analysis", self.feedback_message, "No stability analysis result received")
+        
+        # Only check for stability analysis if the request is standard
+        if "Your request doesn't follow standard procedures" not in self.feedback_message:
+            self.assertIn("Stability analysis", self.feedback_message, "No stability analysis result received")
 
     def test_validate_request_service(self):
         test_request = "Disassemble the frame"
