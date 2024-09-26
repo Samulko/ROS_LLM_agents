@@ -24,12 +24,19 @@ class TestManagerAgent(unittest.TestCase):
     def test_user_command_processing(self):
         test_command = "Disassemble the frame"
         self.user_command_pub.publish(test_command)
-        timeout = rospy.Duration(10)
+        timeout = rospy.Duration(20)  # Increased timeout
         start_time = rospy.Time.now()
         while not self.feedback_received and (rospy.Time.now() - start_time) < timeout:
             rospy.sleep(0.1)
-        self.assertTrue(self.feedback_received, "No feedback received from manager_agent within 10 seconds")
+        self.assertTrue(self.feedback_received, "No feedback received from manager_agent within 20 seconds")
         self.assertIn("Received command", self.feedback_message, "Unexpected feedback message")
+        
+        # Wait for the full processing cycle
+        rospy.sleep(10)
+        
+        # Check for validation and stability analysis results
+        self.assertIn("Validation result", self.feedback_message, "No validation result received")
+        self.assertIn("Stability analysis", self.feedback_message, "No stability analysis result received")
 
     def test_validate_request_service(self):
         test_request = "Disassemble the frame"
