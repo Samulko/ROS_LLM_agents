@@ -60,8 +60,7 @@
   <exec_depend>std_msgs</exec_depend>
   <build_depend>message_generation</build_depend>
   <exec_depend>message_runtime</exec_depend>
-  <exec_depend>manager_agent</exec_depend>
-  <exec_depend>structural_engineer_agent</exec_depend>
+  <!-- Removed individual dependencies on manager_agent and structural_engineer_agent -->
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -21,6 +21,7 @@
   <build_export_depend>rostest</build_export_depend>
   <exec_depend>rostest</exec_depend>
   <test_depend>rostest</test_depend>
+  <!-- Removed dependency on structural_engineer_agent -->
 
   <export>
   </export>
