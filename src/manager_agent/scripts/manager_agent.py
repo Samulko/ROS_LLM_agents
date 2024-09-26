@@ -58,6 +58,7 @@ class ManagerAgent:
             1. Interpret the user's intent.
             2. Determine if we need to route this to the Structural Engineer Agent.
             3. Formulate a clear response or action plan.
+            4. Please say DONE! when the process is complete.
 
             Response:
             """)
