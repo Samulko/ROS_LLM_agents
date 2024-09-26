@@ -144,6 +144,9 @@ class ManagerAgent:
                     except rospy.ServiceException as e:
                         rospy.logerr(f"[ManagerAgent] Stability analysis service call failed: {e}")
                         self.user_feedback_pub.publish(f"I encountered an error during stability analysis. Please try again.")
+                    except Exception as e:
+                        rospy.logerr(f"[ManagerAgent] Unexpected error during stability analysis: {e}")
+                        self.user_feedback_pub.publish(f"An unexpected error occurred during stability analysis. Please try again later.")
             else:
                 rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Here's why: {validation_response.validation_details}")
