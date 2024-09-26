@@ -124,6 +124,7 @@ class ManagerAgent:
 
             # Use the language model to interpret the command
             try:
+                rospy.loginfo(f"[ManagerAgent] Invoking language model for command: {user_command}")
                 response = self.llm.invoke(input=user_command)
                 interpreted_command = response.content.strip()
                 rospy.loginfo(f"[ManagerAgent] Interpreted command: {interpreted_command}")
@@ -139,6 +140,8 @@ class ManagerAgent:
         except Exception as e:
             rospy.logerr(f"[ManagerAgent] Unexpected error handling user command: {e}")
             self.user_feedback_pub.publish(f"An unexpected error occurred. Please try again later.")
+        finally:
+            rospy.loginfo("[ManagerAgent] Finished processing user command")
 
     def process_command(self, command):
         # Process the interpreted command and interact with other agents

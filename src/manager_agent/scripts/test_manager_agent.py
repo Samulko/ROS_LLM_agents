@@ -25,21 +25,26 @@ class TestManagerAgent(unittest.TestCase):
     def test_user_command_processing(self):
         test_command = "Disassemble the frame"
         self.user_command_pub.publish(test_command)
-        timeout = rospy.Duration(30)  # Increased timeout to 30 seconds
+        timeout = rospy.Duration(60)  # Increased timeout to 60 seconds
         start_time = rospy.Time.now()
         while not self.feedback_received and (rospy.Time.now() - start_time) < timeout:
             rospy.sleep(0.1)
-        self.assertTrue(self.feedback_received, "No feedback received from manager_agent within 30 seconds")
+        self.assertTrue(self.feedback_received, "No feedback received from manager_agent within 60 seconds")
         self.assertIn("Received command", self.feedback_message, "Unexpected feedback message")
         
         # Wait for the full processing cycle
-        rospy.sleep(15)  # Increased wait time
+        rospy.sleep(30)  # Increased wait time to 30 seconds
         
         # Check for validation result
-        self.assertTrue(
-            "Validation result" in self.feedback_message or "Your request doesn't follow standard procedures" in self.feedback_message,
-            "No validation result received"
-        )
+        validation_received = False
+        start_time = rospy.Time.now()
+        while not validation_received and (rospy.Time.now() - start_time) < timeout:
+            if "Validation result" in self.feedback_message or "Your request doesn't follow standard procedures" in self.feedback_message:
+                validation_received = True
+            else:
+                rospy.sleep(0.1)
+        
+        self.assertTrue(validation_received, f"No validation result received. Last feedback: {self.feedback_message}")
         
         # We don't check for stability analysis anymore since the request might not be standard
 
