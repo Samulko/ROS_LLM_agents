@@ -23,9 +23,9 @@ catkin_install_python(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-###########
-## Build ##
-###########
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations

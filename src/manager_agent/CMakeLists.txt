@@ -5,10 +5,11 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   multi_agent_system
+  rostest
 )
 
 catkin_package(
-  CATKIN_DEPENDS rospy std_msgs multi_agent_system
+  CATKIN_DEPENDS rospy std_msgs multi_agent_system rostest
 )
 
 include_directories(
@@ -22,6 +23,5 @@ catkin_install_python(PROGRAMS
 )
 
 if(CATKIN_ENABLE_TESTING)
-  find_package(rostest REQUIRED)
   add_rostest(test/test_manager_agent.test)
 endif()
