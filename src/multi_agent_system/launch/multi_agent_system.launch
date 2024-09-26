@@ -10,4 +10,7 @@
 
     <!-- Stability Agent Node -->
     <node name="stability_agent" pkg="stability_agent" type="stability_agent.py" output="screen" />
+
+    <!-- Test Node (only run when testing) -->
+    <node name="test_manager_agent" pkg="manager_agent" type="test_manager_agent.py" output="screen" if="$(arg run_tests)" />
 </launch>

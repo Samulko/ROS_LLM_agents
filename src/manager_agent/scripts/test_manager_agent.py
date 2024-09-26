@@ -3,7 +3,7 @@
 import unittest
 import rospy
 from std_msgs.msg import String
-from multi_agent_system.srv import ValidateRequest
+from multi_agent_system.srv import ValidateRequest, StabilityAnalysis
 
 class TestManagerAgent(unittest.TestCase):
     def setUp(self):
@@ -12,8 +12,10 @@ class TestManagerAgent(unittest.TestCase):
         self.feedback_received = False
         self.feedback_message = ""
         rospy.Subscriber('/user_feedback', String, self.feedback_callback)
-        rospy.wait_for_service('/validate_request')
+        rospy.wait_for_service('/validate_request', timeout=10)
+        rospy.wait_for_service('/stability_analysis', timeout=10)
         self.validate_request = rospy.ServiceProxy('/validate_request', ValidateRequest)
+        self.stability_analysis = rospy.ServiceProxy('/stability_analysis', StabilityAnalysis)
 
     def feedback_callback(self, data):
         self.feedback_received = True
@@ -22,7 +24,7 @@ class TestManagerAgent(unittest.TestCase):
     def test_user_command_processing(self):
         test_command = "Disassemble the frame"
         self.user_command_pub.publish(test_command)
-        timeout = rospy.Duration(10)  # Increase timeout to 10 seconds
+        timeout = rospy.Duration(10)
         start_time = rospy.Time.now()
         while not self.feedback_received and (rospy.Time.now() - start_time) < timeout:
             rospy.sleep(0.1)
@@ -35,6 +37,13 @@ class TestManagerAgent(unittest.TestCase):
         self.assertIsNotNone(response, "No response from validate_request service")
         self.assertIsInstance(response.is_standard, bool, "is_standard should be a boolean")
         self.assertIsInstance(response.validation_details, str, "validation_details should be a string")
+
+    def test_stability_analysis_service(self):
+        test_request = "Disassemble the frame"
+        response = self.stability_analysis(test_request)
+        self.assertIsNotNone(response, "No response from stability_analysis service")
+        self.assertIsInstance(response.is_safe, bool, "is_safe should be a boolean")
+        self.assertIsInstance(response.modifications, str, "modifications should be a string")
 
 if __name__ == '__main__':
     import rostest
