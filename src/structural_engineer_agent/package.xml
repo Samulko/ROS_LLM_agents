@@ -56,6 +56,7 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>multi_agent_system</exec_depend>
+  <!-- Remove dependency on manager_agent if it exists -->
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
