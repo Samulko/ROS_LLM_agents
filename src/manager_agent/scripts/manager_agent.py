@@ -108,9 +108,7 @@ class ManagerAgent:
                 rospy.logwarn("ROS master is not running. Unable to connect to /stability_analysis service.")
 
         # Check if ROS master is running
-        if not rospy.is_shutdown():
-            self.user_feedback_pub.publish("Manager Agent is running and attempting to connect to services.")
-        else:
+        if rospy.is_shutdown():
             rospy.logerr("ROS master is not running. Unable to initialize Manager Agent properly.")
             self.user_feedback_pub.publish("Error: ROS master is not running. Please start roscore and try again.")
 
