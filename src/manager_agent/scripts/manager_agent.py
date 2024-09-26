@@ -85,6 +85,9 @@ class ManagerAgent:
         user_command = msg.data
         rospy.loginfo(f"[ManagerAgent] Received user command: {user_command}")
 
+        # Always publish an initial acknowledgment
+        self.user_feedback_pub.publish(f"Received command: {user_command}. Processing...")
+
         # Use the language model to interpret the command
         try:
             response = self.llm.invoke(input=user_command)
@@ -95,10 +98,7 @@ class ManagerAgent:
             self.process_command(interpreted_command)
         except Exception as e:
             rospy.logerr(f"[ManagerAgent] Error interpreting command: {e}")
-            self.user_feedback_pub.publish("Error interpreting command. Please try again.")
-        
-        # Always publish some feedback, even if it's just an acknowledgment
-        self.user_feedback_pub.publish(f"Received command: {user_command}. Processing...")
+            self.user_feedback_pub.publish(f"Error interpreting command: {e}. Please try again.")
 
     def process_command(self, command):
         # Process the interpreted command and interact with other agents
