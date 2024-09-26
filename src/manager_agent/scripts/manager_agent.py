@@ -126,7 +126,7 @@ class ManagerAgent:
             # Use the language model to interpret the command
             try:
                 rospy.loginfo(f"[ManagerAgent] Invoking language model for command: {user_command}")
-                response = self.llm.invoke(input=user_command)
+                response = self.llm.invoke(input=f"Interpret this command for disassembling a simple portal frame: {user_command}")
                 interpreted_command = response.content.strip()
                 rospy.loginfo(f"[ManagerAgent] Interpreted command: {interpreted_command}")
 

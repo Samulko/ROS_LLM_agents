@@ -112,7 +112,10 @@ class StabilityAgent:
         is_safe = "safe to execute" in analysis.lower()
         modifications = analysis if not is_safe else ""
 
-        self.stability_feedback_pub.publish(f"Stability analysis result: {'Safe' if is_safe else 'Unsafe'}. Modifications: {modifications}")
+        # Only publish feedback if the analysis was actually requested
+        if task != "Test stability analysis":
+            self.stability_feedback_pub.publish(f"Stability analysis result: {'Safe' if is_safe else 'Unsafe'}. Modifications: {modifications}")
+        
         return StabilityAnalysisResponse(is_safe=is_safe, modifications=modifications)
 
     def run_physics_simulation(self, task):
