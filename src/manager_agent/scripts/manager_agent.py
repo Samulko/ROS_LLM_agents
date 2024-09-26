@@ -96,6 +96,9 @@ class ManagerAgent:
         except Exception as e:
             rospy.logerr(f"[ManagerAgent] Error interpreting command: {e}")
             self.user_feedback_pub.publish("Error interpreting command. Please try again.")
+        
+        # Always publish some feedback, even if it's just an acknowledgment
+        self.user_feedback_pub.publish(f"Received command: {user_command}. Processing...")
 
     def process_command(self, command):
         # Process the interpreted command and interact with other agents

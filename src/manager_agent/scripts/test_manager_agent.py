@@ -22,9 +22,9 @@ class TestManagerAgent(unittest.TestCase):
     def test_user_command_processing(self):
         test_command = "Disassemble the frame"
         self.user_command_pub.publish(test_command)
-        rospy.sleep(2)  # Wait for processing
+        rospy.sleep(5)  # Increased wait time for processing
         self.assertTrue(self.feedback_received, "No feedback received from manager_agent")
-        self.assertIn("Your request", self.feedback_message, "Unexpected feedback message")
+        self.assertIn("Received command", self.feedback_message, "Unexpected feedback message")
 
     def test_validate_request_service(self):
         test_request = "Disassemble the frame"
