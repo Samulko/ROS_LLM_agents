@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import String
-from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse
+from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse, StabilityAnalysis, StabilityAnalysisResponse
 import openai
 from openai import OpenAI
 from langchain_openai import ChatOpenAI  # This import should work now
@@ -58,8 +58,9 @@ class ManagerAgent:
         Response:
         """)
 
-        # Initialize validate_request to None
+        # Initialize service proxies to None
         self.validate_request = None
+        self.stability_analysis = None
 
         # Subscribe to the /user_command topic
         self.user_command_sub = rospy.Subscriber('/user_command', String, self.handle_user_command)
@@ -67,7 +68,7 @@ class ManagerAgent:
         # Publisher for user feedback
         self.user_feedback_pub = rospy.Publisher('/user_feedback', String, queue_size=10)
 
-        # Try to connect to the Structural Engineer Agent service
+        # Try to connect to the Structural Engineer Agent and Stability Agent services
         rospy.Timer(rospy.Duration(1), self.try_connect_services)
 
     def try_connect_services(self, event):
@@ -79,6 +80,15 @@ class ManagerAgent:
                 rospy.loginfo("Connected to /validate_request service")
             except rospy.ROSException:
                 rospy.logwarn("Waiting for /validate_request service...")
+
+        # Attempt to connect to the Stability Agent service
+        if self.stability_analysis is None:
+            try:
+                rospy.wait_for_service('/stability_analysis', timeout=1)
+                self.stability_analysis = rospy.ServiceProxy('/stability_analysis', StabilityAnalysis)
+                rospy.loginfo("Connected to /stability_analysis service")
+            except rospy.ROSException:
+                rospy.logwarn("Waiting for /stability_analysis service...")
 
     def handle_user_command(self, msg):
         # Process incoming user commands
@@ -115,11 +125,29 @@ class ManagerAgent:
 
             if validation_response.is_standard:
                 rospy.loginfo(f"[ManagerAgent] Request is standard: {validation_response.validation_details}")
-                self.user_feedback_pub.publish(f"Your request follows standard procedures. Here are the details: {validation_response.validation_details}")
+                self.user_feedback_pub.publish(f"Your request follows standard procedures. Proceeding with stability analysis.")
+            
+                # Perform stability analysis
+                if self.stability_analysis is None:
+                    rospy.logwarn("[ManagerAgent] Stability Agent service is not available.")
+                    self.user_feedback_pub.publish("I'm sorry, but I can't perform stability analysis at the moment. Please try again later.")
+                else:
+                    try:
+                        stability_response = self.stability_analysis(command)
+                        if stability_response.is_safe:
+                            self.user_feedback_pub.publish(f"Stability analysis complete. The task is safe to execute.")
+                        else:
+                            self.user_feedback_pub.publish(f"Stability analysis complete. The task requires modifications: {stability_response.modifications}")
+                    
+                        # Add the stability result to the conversation memory
+                        self.memory.chat_memory.add_ai_message(f"Stability analysis result: {'Safe' if stability_response.is_safe else 'Unsafe'}")
+                    except rospy.ServiceException as e:
+                        rospy.logerr(f"[ManagerAgent] Stability analysis service call failed: {e}")
+                        self.user_feedback_pub.publish(f"I encountered an error during stability analysis. Please try again.")
             else:
                 rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Here's why: {validation_response.validation_details}")
-                
+        
             # Add the validation result to the conversation memory
             self.memory.chat_memory.add_ai_message(f"Validation result: {validation_response.validation_details}")
             

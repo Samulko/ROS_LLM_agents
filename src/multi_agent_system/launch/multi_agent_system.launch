@@ -7,4 +7,7 @@
 
     <!-- Structural Engineer Agent Node -->
     <node name="structural_engineer_agent" pkg="structural_engineer_agent" type="structural_engineer_agent.py" output="screen" />
+
+    <!-- Stability Agent Node -->
+    <node name="stability_agent" pkg="stability_agent" type="stability_agent.py" output="screen" />
 </launch>
