@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
+from std_msgs.msg import String
 from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse
 import openai
 from openai import OpenAI
