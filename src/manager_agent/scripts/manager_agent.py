@@ -112,6 +112,10 @@ class ManagerAgent:
 
     def process_command(self, command):
         # Process the interpreted command and interact with other agents
+        if command.lower() == "test system":
+            self.run_system_test()
+            return
+
         if self.validate_request is None:
             rospy.logwarn("[ManagerAgent] Structural Engineer Agent service is not available. Retrying connection...")
             self.user_feedback_pub.publish("I'm sorry, but I can't validate your request at the moment. Please try again later.")
@@ -157,6 +161,26 @@ class ManagerAgent:
         except rospy.ServiceException as e:
             rospy.logerr(f"[ManagerAgent] Service call failed: {e}")
             self.user_feedback_pub.publish(f"I encountered an error while processing your request. Please try again.")
+
+    def run_system_test(self):
+        rospy.loginfo("[ManagerAgent] Running system test...")
+        self.user_feedback_pub.publish("Running system test...")
+
+        # Test Structural Engineer Agent
+        try:
+            validation_response = self.validate_request("Test disassembly request")
+            self.user_feedback_pub.publish(f"Structural Engineer Agent test result: {validation_response.validation_details}")
+        except Exception as e:
+            self.user_feedback_pub.publish(f"Structural Engineer Agent test failed: {str(e)}")
+
+        # Test Stability Agent
+        try:
+            stability_response = self.stability_analysis("Test stability analysis")
+            self.user_feedback_pub.publish(f"Stability Agent test result: {'Safe' if stability_response.is_safe else 'Unsafe'}")
+        except Exception as e:
+            self.user_feedback_pub.publish(f"Stability Agent test failed: {str(e)}")
+
+        self.user_feedback_pub.publish("System test completed.")
 
 if __name__ == '__main__':
     try:
