@@ -4,10 +4,10 @@ import rospy
 from multi_agent_system.srv import StabilityAnalysis, StabilityAnalysisResponse
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.document_loaders import JSONLoader
+from langchain_community.document_loaders import JSONLoader
 from dotenv import load_dotenv
 import os
 import json
