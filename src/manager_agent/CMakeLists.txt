@@ -19,6 +19,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/manager_agent.py
   scripts/test_manager_agent.py
+  scripts/mock_stability_agent.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
