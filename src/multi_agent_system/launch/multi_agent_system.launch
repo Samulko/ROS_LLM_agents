@@ -3,7 +3,7 @@
     <param name="/openai_api_key" value="$(env OPENAI_API_KEY)" />
 
     <!-- Define the run_tests argument with a default value of false -->
-    <arg name="run_tests" default="false" />
+    <arg name="run_tests" default="true" />
 
     <!-- Manager Agent Node -->
     <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen" />
