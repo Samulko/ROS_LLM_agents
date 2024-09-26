@@ -31,7 +31,7 @@ class AgentResponsesLogger:
 
 if __name__ == '__main__':
     try:
-        AgentResponsesLogger()
+        logger = AgentResponsesLogger()
         rospy.spin()
     except rospy.ROSInterruptException:
         pass

@@ -2,6 +2,7 @@
 
 import rospy
 from multi_agent_system.srv import StabilityAnalysis, StabilityAnalysisResponse
+from std_msgs.msg import String
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS

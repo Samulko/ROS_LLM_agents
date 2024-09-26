@@ -18,5 +18,7 @@
     <node name="test_manager_agent" pkg="manager_agent" type="test_manager_agent.py" output="screen" if="$(arg run_tests)" />
 
     <!-- Agent Responses Logger Node -->
-    <node name="agent_responses_logger" pkg="multi_agent_system" type="agent_responses_logger.py" output="screen" />
+    <node name="agent_responses_logger" pkg="multi_agent_system" type="agent_responses_logger.py" output="screen">
+        <env name="PYTHONUNBUFFERED" value="1" />
+    </node>
 </launch>
