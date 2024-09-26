@@ -53,5 +53,5 @@ class TestManagerAgent(unittest.TestCase):
         self.assertIsInstance(response.modifications, str, "modifications should be a string")
 
 if __name__ == '__main__':
-    import rostest
-    rostest.rosrun('manager_agent', 'test_manager_agent', TestManagerAgent)
+    import rosunit
+    rosunit.unitrun('manager_agent', 'test_manager_agent', TestManagerAgent)
