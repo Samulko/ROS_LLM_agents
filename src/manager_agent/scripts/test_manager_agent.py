@@ -2,6 +2,7 @@
 
 import unittest
 import rospy
+import rostest
 from std_msgs.msg import String
 from multi_agent_system.srv import ValidateRequest, StabilityAnalysis
 
@@ -56,5 +57,4 @@ class TestManagerAgent(unittest.TestCase):
         self.assertIsInstance(response.modifications, str, "modifications should be a string")
 
 if __name__ == '__main__':
-    import rosunit
-    rosunit.unitrun('manager_agent', 'test_manager_agent', TestManagerAgent)
+    rostest.rosrun('manager_agent', 'test_manager_agent', TestManagerAgent)
