@@ -5,6 +5,9 @@
     <!-- Define the run_tests argument with a default value of false -->
     <arg name="run_tests" default="false" />
 
+    <!-- Define the run_id argument with a default value -->
+    <arg name="run_id" default="$(anon run)" />
+
     <!-- Manager Agent Node -->
     <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen" />
 
