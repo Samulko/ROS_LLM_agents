@@ -5,12 +5,13 @@ from std_msgs.msg import String
 from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse, StabilityAnalysis, StabilityAnalysisResponse
 import openai
 from openai import OpenAI
-from langchain_openai import ChatOpenAI  # This import should work now
+from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
 from dotenv import load_dotenv
 import os
+import sys
 
 # Load environment variables from .env file
 load_dotenv()
@@ -18,58 +19,67 @@ print(f"OPENAI_API_KEY loaded in Manager Agent: {'Yes' if os.getenv('OPENAI_API_
 
 class ManagerAgent:
     def __init__(self):
-        # Initialize ROS node
-        rospy.init_node('manager_agent', anonymous=False)
+        try:
+            # Initialize ROS node
+            rospy.init_node('manager_agent', anonymous=False)
 
-        # Get OpenAI API key from environment variables
-        self.openai_api_key = os.getenv('OPENAI_API_KEY')
-        if not self.openai_api_key:
-            rospy.logerr("OPENAI_API_KEY not found in .env file")
-            raise ValueError("OPENAI_API_KEY not set")
-        
-        # Initialize ChatOpenAI model
-        self.llm = ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=self.openai_api_key)
+            # Get OpenAI API key from environment variables
+            self.openai_api_key = os.getenv('OPENAI_API_KEY')
+            if not self.openai_api_key:
+                rospy.logerr("OPENAI_API_KEY not found in .env file")
+                raise ValueError("OPENAI_API_KEY not set")
+            
+            # Initialize ChatOpenAI model
+            self.llm = ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=self.openai_api_key)
 
-        # Initialize conversation memory
-        self.memory = ConversationBufferMemory(return_messages=True)
+            # Initialize conversation memory
+            self.memory = ConversationBufferMemory(return_messages=True)
 
-        # Define the prompt template for the AI
-        self.prompt = ChatPromptTemplate.from_template("""
-        You are the Manager Agent in a multi-agent robotic system for disassembly tasks. Your role is to coordinate all interactions and assign tasks to other agents. You are responsible for:
+            # Define the prompt template for the AI
+            self.prompt = ChatPromptTemplate.from_template("""
+            You are the Manager Agent in a multi-agent robotic system for disassembly tasks. Your role is to coordinate all interactions and assign tasks to other agents. You are responsible for:
 
-        1. Interpreting user commands accurately, even if they are ambiguous or complex.
-        2. Maintaining context over multiple interactions using conversation history.
-        3. Routing tasks to the Structural Engineer Agent for initial validation.
-        4. Communicating results to the user.
+            1. Interpreting user commands accurately, even if they are ambiguous or complex.
+            2. Maintaining context over multiple interactions using conversation history.
+            3. Routing tasks to the Structural Engineer Agent for initial validation.
+            4. Communicating results to the user.
 
-        The agent you coordinate is:
-        - Structural Engineer Agent: Validates requests against current disassembly manuals using a RAG system.
+            The agent you coordinate is:
+            - Structural Engineer Agent: Validates requests against current disassembly manuals using a RAG system.
 
-        Use your advanced natural language understanding to interpret the user's intent and maintain conversation context. Always strive for clear communication and efficient task routing.
+            Use your advanced natural language understanding to interpret the user's intent and maintain conversation context. Always strive for clear communication and efficient task routing.
 
-        Current conversation:
-        {history}
-        Human: {human_input}
-        AI: Let's process this request step by step:
-        1. Interpret the user's intent.
-        2. Determine if we need to route this to the Structural Engineer Agent.
-        3. Formulate a clear response or action plan.
+            Current conversation:
+            {history}
+            Human: {human_input}
+            AI: Let's process this request step by step:
+            1. Interpret the user's intent.
+            2. Determine if we need to route this to the Structural Engineer Agent.
+            3. Formulate a clear response or action plan.
 
-        Response:
-        """)
+            Response:
+            """)
 
-        # Initialize service proxies to None
-        self.validate_request = None
-        self.stability_analysis = None
+            # Initialize service proxies to None
+            self.validate_request = None
+            self.stability_analysis = None
 
-        # Subscribe to the /user_command topic
-        self.user_command_sub = rospy.Subscriber('/user_command', String, self.handle_user_command)
+            # Subscribe to the /user_command topic
+            self.user_command_sub = rospy.Subscriber('/user_command', String, self.handle_user_command)
 
-        # Publisher for user feedback
-        self.user_feedback_pub = rospy.Publisher('/user_feedback', String, queue_size=10)
+            # Publisher for user feedback
+            self.user_feedback_pub = rospy.Publisher('/user_feedback', String, queue_size=10)
 
-        # Try to connect to the Structural Engineer Agent and Stability Agent services
-        rospy.Timer(rospy.Duration(1), self.try_connect_services)
+            # Try to connect to the Structural Engineer Agent and Stability Agent services
+            rospy.Timer(rospy.Duration(1), self.try_connect_services)
+
+            rospy.loginfo("Manager Agent initialized successfully.")
+        except rospy.ROSInitException as e:
+            rospy.logerr(f"Failed to initialize ROS node: {e}")
+            sys.exit(1)
+        except Exception as e:
+            rospy.logerr(f"Error initializing Manager Agent: {e}")
+            sys.exit(1)
 
     def try_connect_services(self, event):
         # Attempt to connect to the Structural Engineer Agent service
@@ -80,6 +90,8 @@ class ManagerAgent:
                 rospy.loginfo("Connected to /validate_request service")
             except rospy.ROSException:
                 rospy.logwarn("Waiting for /validate_request service...")
+            except rospy.ROSInterruptException:
+                rospy.logwarn("ROS master is not running. Unable to connect to /validate_request service.")
 
         # Attempt to connect to the Stability Agent service
         if self.stability_analysis is None:
@@ -89,26 +101,42 @@ class ManagerAgent:
                 rospy.loginfo("Connected to /stability_analysis service")
             except rospy.ROSException:
                 rospy.logwarn("Waiting for /stability_analysis service...")
+            except rospy.ROSInterruptException:
+                rospy.logwarn("ROS master is not running. Unable to connect to /stability_analysis service.")
+
+        # Check if ROS master is running
+        if not rospy.is_shutdown():
+            self.user_feedback_pub.publish("Manager Agent is running and attempting to connect to services.")
+        else:
+            rospy.logerr("ROS master is not running. Unable to initialize Manager Agent properly.")
+            self.user_feedback_pub.publish("Error: ROS master is not running. Please start roscore and try again.")
 
     def handle_user_command(self, msg):
-        # Process incoming user commands
-        user_command = msg.data
-        rospy.loginfo(f"[ManagerAgent] Received user command: {user_command}")
-
-        # Always publish an initial acknowledgment
-        self.user_feedback_pub.publish(f"Received command: {user_command}. Processing...")
-
-        # Use the language model to interpret the command
         try:
-            response = self.llm.invoke(input=user_command)
-            interpreted_command = response.content.strip()
-            rospy.loginfo(f"[ManagerAgent] Interpreted command: {interpreted_command}")
+            # Process incoming user commands
+            user_command = msg.data
+            rospy.loginfo(f"[ManagerAgent] Received user command: {user_command}")
 
-            # Process the interpreted command
-            self.process_command(interpreted_command)
+            # Always publish an initial acknowledgment
+            self.user_feedback_pub.publish(f"Received command: {user_command}. Processing...")
+
+            # Use the language model to interpret the command
+            try:
+                response = self.llm.invoke(input=user_command)
+                interpreted_command = response.content.strip()
+                rospy.loginfo(f"[ManagerAgent] Interpreted command: {interpreted_command}")
+
+                # Process the interpreted command
+                self.process_command(interpreted_command)
+            except Exception as e:
+                rospy.logerr(f"[ManagerAgent] Error interpreting command: {e}")
+                self.user_feedback_pub.publish(f"Error interpreting command: {e}. Please try again.")
+        except rospy.ROSInterruptException:
+            rospy.logerr("ROS master is not running. Unable to process user command.")
+            self.user_feedback_pub.publish("Error: ROS master is not running. Please start roscore and try again.")
         except Exception as e:
-            rospy.logerr(f"[ManagerAgent] Error interpreting command: {e}")
-            self.user_feedback_pub.publish(f"Error interpreting command: {e}. Please try again.")
+            rospy.logerr(f"[ManagerAgent] Unexpected error handling user command: {e}")
+            self.user_feedback_pub.publish(f"An unexpected error occurred. Please try again later.")
 
     def process_command(self, command):
         # Process the interpreted command and interact with other agents
