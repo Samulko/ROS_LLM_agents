@@ -21,4 +21,7 @@
     <node name="agent_responses_logger" pkg="multi_agent_system" type="agent_responses_logger.py" output="screen">
         <env name="PYTHONUNBUFFERED" value="1" />
     </node>
+
+    <!-- Output the log file path -->
+    <node name="log_file_path_publisher" pkg="rostopic" type="rostopic" args="pub /log_file_path std_msgs/String 'data: $(find multi_agent_system)/../data/responses/agent_responses_$(arg run_id).log'" output="screen" />
 </launch>
