@@ -105,7 +105,7 @@ class StabilityAgent:
         context = "\n".join([doc.page_content for doc in docs])
 
         # Use the LLM to analyze stability
-        response = self.llm(self.prompt.format(task=task, context=context))
+        response = self.llm.invoke(self.prompt.format(task=task, context=context))
         analysis = response.content.strip()
 
         # Determine if the task is safe

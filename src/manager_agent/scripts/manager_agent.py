@@ -184,6 +184,7 @@ class ManagerAgent:
             else:
                 rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Here's why: {validation_response.validation_details}")
+                self.user_feedback_pub.publish("Please revise your request to follow the standard procedures.")
         
             # Add the validation result to the conversation memory
             self.memory.chat_memory.add_ai_message(f"Validation result: {validation_response.validation_details}")
