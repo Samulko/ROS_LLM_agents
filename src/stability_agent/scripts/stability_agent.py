@@ -55,7 +55,11 @@ class StabilityAgent:
 
     def initialize_rag_system(self):
         # Load and process the past stability assessments
-        assessments_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'stability_assessments.json')
+        assessments_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'stability_assessments.json')
+        os.makedirs(os.path.dirname(assessments_path), exist_ok=True)
+        if not os.path.exists(assessments_path):
+            with open(assessments_path, 'w') as f:
+                json.dump({"assessments": []}, f)
         
         def extract_data(data):
             return ' '.join([
