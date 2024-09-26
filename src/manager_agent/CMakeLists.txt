@@ -5,7 +5,6 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   multi_agent_system
-  rostest
 )
 
 catkin_package(

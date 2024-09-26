@@ -18,6 +18,7 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>multi_agent_system</exec_depend>
   <build_depend>rostest</build_depend>
+  <build_export_depend>rostest</build_export_depend>
   <test_depend>rostest</test_depend>
 
   <export>
