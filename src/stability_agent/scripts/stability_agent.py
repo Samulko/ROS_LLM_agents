@@ -54,35 +54,45 @@ class StabilityAgent:
         rospy.loginfo("Stability Agent Initialized.")
 
     def initialize_rag_system(self):
-        # Load and process the past stability assessments
-        assessments_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'stability_assessments.json')
-        os.makedirs(os.path.dirname(assessments_path), exist_ok=True)
-        if not os.path.exists(assessments_path):
-            with open(assessments_path, 'w') as f:
-                json.dump({"assessments": []}, f)
-        
-        def extract_data(data):
-            return ' '.join([
-                data['task_description'],
-                ' '.join(data['risk_factors']),
-                ' '.join(data['stability_measures']),
-                ' '.join(data['outcome'])
-            ])
+        try:
+            # Load and process the past stability assessments
+            assessments_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'stability_assessments.json')
+            os.makedirs(os.path.dirname(assessments_path), exist_ok=True)
+            if not os.path.exists(assessments_path):
+                with open(assessments_path, 'w') as f:
+                    json.dump({"assessments": []}, f)
+            
+            def extract_data(data):
+                return ' '.join([
+                    data['task_description'],
+                    ' '.join(data['risk_factors']),
+                    ' '.join(data['stability_measures']),
+                    ' '.join(data['outcome'])
+                ])
 
-        loader = JSONLoader(
-            file_path=assessments_path,
-            jq_schema='.assessments[]',
-            content_key=None,
-            text_content=extract_data
-        )
+            loader = JSONLoader(
+                file_path=assessments_path,
+                jq_schema='.assessments[]',
+                content_key=None,
+                text_content=extract_data
+            )
 
-        documents = loader.load()
-        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        texts = text_splitter.split_documents(documents)
+            documents = loader.load()
+            if not documents:
+                rospy.logwarn("No documents loaded from stability_assessments.json. Initializing empty vector store.")
+                self.vectorstore = FAISS.from_texts([""], OpenAIEmbeddings(openai_api_key=self.openai_api_key))
+                return
 
-        # Create vector store
-        embeddings = OpenAIEmbeddings(openai_api_key=self.openai_api_key)
-        self.vectorstore = FAISS.from_documents(texts, embeddings)
+            text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+            texts = text_splitter.split_documents(documents)
+
+            # Create vector store
+            embeddings = OpenAIEmbeddings(openai_api_key=self.openai_api_key)
+            self.vectorstore = FAISS.from_documents(texts, embeddings)
+            rospy.loginfo("RAG system initialized successfully")
+        except Exception as e:
+            rospy.logerr(f"Error initializing RAG system: {str(e)}")
+            self.vectorstore = None
 
     def handle_stability_analysis(self, req):
         task = req.task
