@@ -3,6 +3,8 @@
 import rospy
 from std_msgs.msg import String
 from termcolor import colored
+import signal
+import sys
 
 class AgentResponsesLogger:
     def __init__(self):
@@ -12,6 +14,10 @@ class AgentResponsesLogger:
         rospy.Subscriber('/user_feedback', String, self.log_manager_response)
         rospy.Subscriber('/structural_engineer_feedback', String, self.log_structural_engineer_response)
         rospy.Subscriber('/stability_feedback', String, self.log_stability_response)
+        
+        # Set up signal handlers
+        signal.signal(signal.SIGINT, self.signal_handler)
+        signal.signal(signal.SIGTERM, self.signal_handler)
         
         rospy.loginfo("Agent Responses Logger initialized.")
 
@@ -28,6 +34,11 @@ class AgentResponsesLogger:
         formatted_message = f"\n{'-'*80}\n{colored(agent_name, color, attrs=['bold'])}: {message}\n{'-'*80}\n"
         print(formatted_message)
         rospy.loginfo(formatted_message)
+
+    def signal_handler(self, signum, frame):
+        rospy.loginfo("Shutdown signal received. Cleaning up...")
+        rospy.signal_shutdown("Received shutdown signal")
+        sys.exit(0)
 
 if __name__ == '__main__':
     try:
