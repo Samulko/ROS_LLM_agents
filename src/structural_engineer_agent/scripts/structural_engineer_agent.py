@@ -55,6 +55,7 @@ class StructuralEngineerAgent:
 
             # Set up ROS service for request validation
             self.validate_request_service = rospy.Service('/validate_request', ValidateRequest, self.handle_validate_request)
+            self.structural_engineer_feedback_pub = rospy.Publisher('/structural_engineer_feedback', String, queue_size=10)
 
             rospy.loginfo("Structural Engineer Agent Initialized.")
         except Exception as e:
@@ -125,6 +126,7 @@ class StructuralEngineerAgent:
             )
             validation_details = response.choices[0].message.content
             rospy.loginfo(f"StructuralEngineerAgent: Validation details: {validation_details}")
+            self.structural_engineer_feedback_pub.publish(f"Validation result: {validation_details}")
 
             # Determine if the request follows standard procedures
             is_standard = "follows standard procedures" in validation_details.lower()

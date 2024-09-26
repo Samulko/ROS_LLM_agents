@@ -69,8 +69,9 @@ class ManagerAgent:
             # Subscribe to the /user_command topic
             self.user_command_sub = rospy.Subscriber('/user_command', String, self.handle_user_command)
 
-            # Publisher for user feedback
+            # Publishers for user feedback and agent responses
             self.user_feedback_pub = rospy.Publisher('/user_feedback', String, queue_size=10)
+            self.manager_response_pub = rospy.Publisher('/manager_response', String, queue_size=10)
 
             # Try to connect to the Structural Engineer Agent and Stability Agent services
             rospy.Timer(rospy.Duration(1), self.try_connect_services)
@@ -121,6 +122,7 @@ class ManagerAgent:
 
             # Always publish an initial acknowledgment
             self.user_feedback_pub.publish(f"Received command: {user_command}. Processing...")
+            self.manager_response_pub.publish(f"Processing command: {user_command}")
 
             # Use the language model to interpret the command
             try:
