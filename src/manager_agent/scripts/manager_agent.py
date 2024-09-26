@@ -21,13 +21,15 @@ class ManagerAgent:
     def __init__(self):
         try:
             # Initialize ROS node
-            rospy.init_node('manager_agent', anonymous=False)
+            rospy.init_node('manager_agent', anonymous=False, log_level=rospy.DEBUG)
+            rospy.loginfo("ROS node initialized successfully")
 
             # Get OpenAI API key from environment variables
             self.openai_api_key = os.getenv('OPENAI_API_KEY')
             if not self.openai_api_key:
-                rospy.logerr("OPENAI_API_KEY not found in .env file")
+                rospy.logerr("OPENAI_API_KEY not found in environment variables")
                 raise ValueError("OPENAI_API_KEY not set")
+            rospy.loginfo("OpenAI API key loaded successfully")
             
             # Initialize ChatOpenAI model
             self.llm = ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=self.openai_api_key)
