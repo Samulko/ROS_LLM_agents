@@ -76,10 +76,10 @@ class ManagerAgent:
             rospy.loginfo("Manager Agent initialized successfully.")
         except rospy.ROSInitException as e:
             rospy.logerr(f"Failed to initialize ROS node: {e}")
-            sys.exit(1)
+            raise
         except Exception as e:
             rospy.logerr(f"Error initializing Manager Agent: {e}")
-            sys.exit(1)
+            raise
 
     def try_connect_services(self, event):
         # Attempt to connect to the Structural Engineer Agent service
