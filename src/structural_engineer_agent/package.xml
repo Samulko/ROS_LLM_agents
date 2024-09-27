@@ -54,6 +54,11 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
 
+  <!-- Add the following lines -->
+  <build_depend>multi_agent_system</build_depend>
+  <build_export_depend>multi_agent_system</build_export_depend>
+  <exec_depend>multi_agent_system</exec_depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
