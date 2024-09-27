@@ -163,8 +163,11 @@ class ManagerAgent:
 
             if validation_response.is_standard:
                 rospy.loginfo(f"[ManagerAgent] Request is standard: {validation_response.validation_details}")
-                self.user_feedback_pub.publish(f"Your request follows standard procedures. Proceeding with stability analysis.")
-            
+                self.user_feedback_pub.publish(f"Your request follows standard procedures. No further analysis needed.")
+            else:
+                rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
+                self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Proceeding with stability analysis.")
+
                 # Perform stability analysis
                 if self.stability_analysis is None:
                     rospy.logwarn("[ManagerAgent] Stability Agent service is not available.")
@@ -185,11 +188,7 @@ class ManagerAgent:
                     except Exception as e:
                         rospy.logerr(f"[ManagerAgent] Unexpected error during stability analysis: {e}")
                         self.user_feedback_pub.publish(f"An unexpected error occurred during stability analysis. Please try again later.")
-            else:
-                rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
-                self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Here's why: {validation_response.validation_details}")
-                self.user_feedback_pub.publish("Please revise your request to follow the standard procedures.")
-        
+            
             # Add the validation result to the conversation memory
             self.memory.chat_memory.add_ai_message(f"Validation result: {validation_response.validation_details}")
             
