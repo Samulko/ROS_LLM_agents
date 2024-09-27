@@ -69,3 +69,7 @@
 
   </export>
 </package>
+  <exec_depend>manager_agent</exec_depend>
+  <exec_depend>structural_engineer_agent</exec_depend>
+  <exec_depend>planning_agent</exec_depend>
+  <exec_depend>stability_agent</exec_depend>

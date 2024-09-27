@@ -12,10 +12,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   multi_agent_system
   message_generation
-  instructor
-  langchain_community
-  langchain_openai
-  openai
+  rospy
+  std_msgs
+  multi_agent_system
+  message_generation
 )
 
 catkin_package(
