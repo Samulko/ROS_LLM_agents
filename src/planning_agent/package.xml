@@ -57,8 +57,16 @@
   <exec_depend>std_msgs</exec_depend>
   <build_depend>message_generation</build_depend>
   <exec_depend>message_runtime</exec_depend>
+  <build_depend>instructor</build_depend>
+  <build_depend>langchain_community</build_depend>
+  <build_depend>langchain_openai</build_depend>
+  <build_depend>openai</build_depend>
   <build_depend>multi_agent_system</build_depend>
   <build_export_depend>multi_agent_system</build_export_depend>
+  <exec_depend>instructor</exec_depend>
+  <exec_depend>langchain_community</exec_depend>
+  <exec_depend>langchain_openai</exec_depend>
+  <exec_depend>openai</exec_depend>
   <exec_depend>multi_agent_system</exec_depend>
 
 
