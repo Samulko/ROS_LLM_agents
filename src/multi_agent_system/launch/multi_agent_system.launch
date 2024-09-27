@@ -18,8 +18,6 @@
     <!-- Stability Agent Node -->
     <node name="stability_agent" pkg="stability_agent" type="stability_agent.py" output="screen" />
 
-    <!-- Test Node (always run) -->
-    <node name="test_manager_agent" pkg="manager_agent" type="test_manager_agent.py" output="screen" />
 
     <!-- Agent Responses Logger Node -->
     <node name="agent_responses_logger" pkg="multi_agent_system" type="agent_responses_logger.py" output="screen">
