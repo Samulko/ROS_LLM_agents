@@ -36,6 +36,7 @@ include_directories(
 
 catkin_install_python(PROGRAMS
   scripts/agent_responses_logger.py
+  scripts/user_input.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

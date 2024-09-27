@@ -8,7 +8,8 @@
     <!-- Define the run_id argument with a default value -->
     <arg name="run_id" default="$(anon run)" />
 
-    <!-- Manager Agent Node -->
+    <!-- User Input Node -->
+    <node name="user_input_node" pkg="multi_agent_system" type="user_input.py" output="screen" />
     <node name="manager_agent" pkg="manager_agent" type="manager_agent.py" output="screen" />
 
     <!-- Structural Engineer Agent Node -->
