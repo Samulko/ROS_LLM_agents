@@ -176,7 +176,7 @@ class ManagerAgent:
 
             if validation_response.is_standard:
                 rospy.loginfo(f"[ManagerAgent] Request is standard: {validation_response.validation_details}")
-                self.user_feedback_pub.publish(f"Your request follows standard procedures. No further analysis needed.")
+                self.user_feedback_pub.publish(f"Your request follows standard procedures.")
             else:
                 rospy.loginfo(f"[ManagerAgent] Request is non-standard: {validation_response.validation_details}")
                 self.user_feedback_pub.publish(f"Your request doesn't follow standard procedures. Proceeding with stability analysis.")
@@ -192,26 +192,30 @@ class ManagerAgent:
                 
                         # Add the stability result to the conversation memory
                         self.memory.chat_memory.add_ai_message(f"Stability analysis result: {'Safe' if stability_response.is_safe else 'Unsafe. Modifications required: ' + stability_response.modifications}")
-
-                        # Proceed with planning regardless of stability result
-                        try:
-                            planning_response = self.plan_execution(command)
-                            if planning_response.success:
-                                self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
-                            else:
-                                self.user_feedback_pub.publish(f"Planning failed. Details: {planning_response.execution_details}")
-                        except rospy.ServiceException as e:
-                            rospy.logerr(f"[ManagerAgent] Planning service call failed: {e}")
-                            self.user_feedback_pub.publish(f"I encountered an error during planning. Please try again.")
-                        except Exception as e:
-                            rospy.logerr(f"[ManagerAgent] Unexpected error during planning: {e}")
-                            self.user_feedback_pub.publish(f"An unexpected error occurred during planning. Please try again later.")
                     except rospy.ServiceException as e:
                         rospy.logerr(f"[ManagerAgent] Stability analysis service call failed: {e}")
                         self.user_feedback_pub.publish(f"I encountered an error during stability analysis. Please try again.")
                     except Exception as e:
                         rospy.logerr(f"[ManagerAgent] Unexpected error during stability analysis: {e}")
                         self.user_feedback_pub.publish(f"An unexpected error occurred during stability analysis. Please try again later.")
+
+            # Proceed with planning regardless of validation or stability result
+            if self.plan_execution is None:
+                rospy.logwarn("[ManagerAgent] Planning Agent service is not available.")
+                self.user_feedback_pub.publish("I'm sorry, but I can't perform planning at the moment. Please try again later.")
+            else:
+                try:
+                    planning_response = self.plan_execution(command)
+                    if planning_response.success:
+                        self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
+                    else:
+                        self.user_feedback_pub.publish(f"Planning failed. Details: {planning_response.execution_details}")
+                except rospy.ServiceException as e:
+                    rospy.logerr(f"[ManagerAgent] Planning service call failed: {e}")
+                    self.user_feedback_pub.publish(f"I encountered an error during planning. Please try again.")
+                except Exception as e:
+                    rospy.logerr(f"[ManagerAgent] Unexpected error during planning: {e}")
+                    self.user_feedback_pub.publish(f"An unexpected error occurred during planning. Please try again later.")
             
             # Add the validation result to the conversation memory
             self.memory.chat_memory.add_ai_message(f"Validation result: {validation_response.validation_details}")
