@@ -115,6 +115,7 @@ class ManagerAgent:
                 rospy.wait_for_service('/plan_execution', timeout=1)
                 self.plan_execution = rospy.ServiceProxy('/plan_execution', PlanExecution)
                 rospy.loginfo("Connected to /plan_execution service")
+                self.user_feedback_pub.publish("Planning Agent is connected and ready to work.")
             except rospy.ROSException:
                 rospy.logwarn("Waiting for /plan_execution service...")
             except rospy.ROSInterruptException:

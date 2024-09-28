@@ -29,7 +29,7 @@ class PlanningAgent:
         # Publisher to robot control interface
         self.robot_control_pub = rospy.Publisher('/robot_control_command', String, queue_size=10)
 
-        rospy.loginfo("Planning Agent Initialized.")
+        rospy.loginfo("Planning Agent Initialized and ready to work.")
 
     def handle_plan_execution(self, req):
         plan = req.plan
