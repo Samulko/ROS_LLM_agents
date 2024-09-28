@@ -71,23 +71,35 @@ This project implements an advanced Intelligent Robotic Disassembly System, leve
 
 - **Function**: Translates validated or modified plans into specific, low-level robotic actions. Ensures that all actions are safe and align with the intended high-level plan by using standardized schemas and error-checking mechanisms.
 - **Key Enhancements**:
-    - **Standardized Action Schemas**: Utilizes detailed templates to standardize the translation process.
+    - **Standardized Action Schemas**: Utilizes detailed library of actions to standardize the translation process.
     - **Error-Checking Mechanisms**: Verifies that low-level actions match the high-level plan.
-    - **Structured Output Formats**: Generates action sequences in clear formats like JSON or YAML.
+    - **Structured Output Formats**: Generates action sequences in clear JSON format. To guarantee a structure of the JSON, we can use instructor library: https://python.useinstructor.com/examples/
     - **Validation Against Schemas**: Ensures actions are compliant with predefined structures to prevent errors.
 - **Key Tasks**:
     - Translates plans into detailed robotic action sequences.
-    - Executes additional steps required for safety.
     - Validates and error-checks action sequences.
-    - Executes the action sequence via the robotic arm.
+    - Creates a JSON file that can be used to control the robot. The structure of this JSON looks like this:
+    - The structure of this JSON looks like this:
+    ```json
+    {
+      "human_working": true,
+      "selected_element": "element3",
+      "planning_sequence": [
+        "moveto(home)",
+        "holding",
+        "picking",
+        "moveto(home)"
+      ]
+    }
+    ```
     - Reports execution status back to the **Manager Agent**.
 - **Pipeline Steps**:
     1. Receives the plan from the **Stability Agent** or **Structural Engineer Agent**.
     2. Translates the plan into structured action sequences.
     3. Validates actions against schemas with error-checking.
-    4. Executes preliminary steps (e.g., supporting structures).
-    5. Carries out the final disassembly actions.
-    6. Reports back to the **Manager Agent**.
+    4. Writes the JSON file.
+    5. Reports back to the **Manager Agent**.
+
 
 ## High-Level LangChain Setup for Multi-Agent Robotic Control System
 
