@@ -19,3 +19,4 @@ if __name__ == '__main__':
         publish_log_file_path()
     except rospy.ROSInterruptException:
         pass
+#!/usr/bin/env python3
