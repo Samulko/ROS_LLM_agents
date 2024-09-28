@@ -43,6 +43,10 @@ class PlanningAgent:
             # Execute preliminary steps
             self.execute_preliminary_steps()
 
+            # Check if additional safety measures are needed
+            if "unsafe" in plan.lower() or "modifications" in plan.lower():
+                action_sequence = self.add_safety_measures(action_sequence)
+
             # Write the JSON file
             json_file_path = self.write_json_file(action_sequence)
 
@@ -51,6 +55,17 @@ class PlanningAgent:
             return PlanExecutionResponse(success=success, execution_details=f"{execution_details}. JSON file created at {json_file_path}")
         else:
             return PlanExecutionResponse(success=False, execution_details="Invalid action sequence.")
+
+    def add_safety_measures(self, action_sequence):
+        rospy.loginfo("Planning Agent: Adding additional safety measures to the action sequence")
+        # Add safety measures to the action sequence
+        safety_measures = [
+            "implement_temporary_supports",
+            "distribute_load_evenly",
+            "monitor_stability_continuously"
+        ]
+        action_sequence["planning_sequence"] = safety_measures + action_sequence["planning_sequence"]
+        return action_sequence
 
     def translate_plan(self, plan):
         rospy.loginfo(f"Planning Agent: Translating plan: {plan}")
