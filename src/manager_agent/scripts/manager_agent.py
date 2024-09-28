@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import String
-from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse, StabilityAnalysis, StabilityAnalysisResponse
+from multi_agent_system.srv import ValidateRequest, ValidateRequestResponse, StabilityAnalysis, StabilityAnalysisResponse, PlanExecution, PlanExecutionResponse
 import openai
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
@@ -66,6 +66,7 @@ class ManagerAgent:
             # Initialize service proxies to None
             self.validate_request = None
             self.stability_analysis = None
+            self.plan_execution = None
 
             # Subscribe to the /user_command topic
             self.user_command_sub = rospy.Subscriber('/user_command', String, self.handle_user_command)
@@ -107,6 +108,17 @@ class ManagerAgent:
                 rospy.logwarn("Waiting for /stability_analysis service...")
             except rospy.ROSInterruptException:
                 rospy.logwarn("ROS master is not running. Unable to connect to /stability_analysis service.")
+
+        # Attempt to connect to the Planning Agent service
+        if self.plan_execution is None:
+            try:
+                rospy.wait_for_service('/plan_execution', timeout=1)
+                self.plan_execution = rospy.ServiceProxy('/plan_execution', PlanExecution)
+                rospy.loginfo("Connected to /plan_execution service")
+            except rospy.ROSException:
+                rospy.logwarn("Waiting for /plan_execution service...")
+            except rospy.ROSInterruptException:
+                rospy.logwarn("ROS master is not running. Unable to connect to /plan_execution service.")
 
         # Check if ROS master is running
         if rospy.is_shutdown():
@@ -177,9 +189,22 @@ class ManagerAgent:
                         stability_response = self.stability_analysis(command)
                         if stability_response.is_safe:
                             self.user_feedback_pub.publish(f"Stability analysis complete. The task is safe to execute.")
+                            # Proceed with planning
+                            try:
+                                planning_response = self.plan_execution(command)
+                                if planning_response.success:
+                                    self.user_feedback_pub.publish(f"Planning complete. Execution details: {planning_response.execution_details}")
+                                else:
+                                    self.user_feedback_pub.publish(f"Planning failed. Details: {planning_response.execution_details}")
+                            except rospy.ServiceException as e:
+                                rospy.logerr(f"[ManagerAgent] Planning service call failed: {e}")
+                                self.user_feedback_pub.publish(f"I encountered an error during planning. Please try again.")
+                            except Exception as e:
+                                rospy.logerr(f"[ManagerAgent] Unexpected error during planning: {e}")
+                                self.user_feedback_pub.publish(f"An unexpected error occurred during planning. Please try again later.")
                         else:
                             self.user_feedback_pub.publish(f"Stability analysis complete. The task requires modifications: {stability_response.modifications}")
-                    
+                
                         # Add the stability result to the conversation memory
                         self.memory.chat_memory.add_ai_message(f"Stability analysis result: {'Safe' if stability_response.is_safe else 'Unsafe'}")
                     except rospy.ServiceException as e:
