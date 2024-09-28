@@ -21,7 +21,7 @@ class PlanningAgent:
         openai.api_key = self.openai_api_key
 
         # Initialize ChatOpenAI
-        self.llm = ChatOpenAI(temperature=0, model_name="gpt-4-0125-preview", openai_api_key=self.openai_api_key)
+        self.llm = ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=self.openai_api_key)
 
         # Service to execute plans
         self.plan_execution_service = rospy.Service('/plan_execution', PlanExecution, self.handle_plan_execution)
